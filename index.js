@@ -21,5 +21,5 @@ const offersRoutes = require("./routes/offers");
 app.use(offersRoutes);
 
 app.listen(process.env.PORT, () => {
-  console.log("Server has started!");
+  console.log("Server has started!!!");
 });
