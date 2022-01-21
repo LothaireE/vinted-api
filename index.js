@@ -14,10 +14,15 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true,
 });
 
+app.get("/", (req, res) => {
+  res.json("ça marche");
+});
+
 const usersRoutes = require("./routes/users");
 app.use(usersRoutes);
 
 const offersRoutes = require("./routes/offers");
+const req = require("express/lib/request");
 app.use(offersRoutes);
 
 app.listen(process.env.PORT, () => {
