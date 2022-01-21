@@ -78,15 +78,16 @@ router.get("/offers", async (req, res) => {
     // console.log(filters);
 
     // const offers = await Offer.find(filters).limit(3).sort("desc");
-    const offers = await Offer.find({
-      product_price: { $gte: price_min, $lte: price_max },
-    })
-      .sort({ product_price: "desc" })
-      .limit(req.query.limit)
-      .skip(2)
-      .select("product_name product_price");
+    // const offers = await Offer.find({
+    //   product_price: { $gte: price_min, $lte: price_max },
+    // })
 
-    console.log(offers);
+    //   .sort({ product_price: "desc" })
+    //   .limit(req.query.limit)
+    //   .skip(2)
+    //   .select("product_name product_price");
+
+    // console.log(offers);
     // newPage = req.query.page;
     // const page = await Offer.find().select(
     //   "product_name product_detail product"
@@ -97,7 +98,7 @@ router.get("/offers", async (req, res) => {
     // const offer = await Offer.findOne({
     //   token: req.headers.authorization.replace("Bearer ", ""),
     // console.log("====>", page);
-
+    const offers = await Offer.find();
     res.status(200).json({
       offers,
     });
