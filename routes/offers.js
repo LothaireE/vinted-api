@@ -63,47 +63,73 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
 });
 
 router.get("/offers", async (req, res) => {
+  // try {
+  // const offer = await User.findOne
+  const title = req.query.title;
+  const price_min = req.query.priceMin;
+  const price_max = req.query.priceMax;
+
+  const filtersObject = {};
+
+  if (title) {
+    filtersObject.product_name = new RegExp(title, "i");
+  }
+
+  if (price_min) {
+    filtersObject.product_price = {
+      $gte: price_min,
+    };
+  }
+
+  if (price_max) {
+    if (filtersObject.product_price) {
+      filtersObject.product_price.$lte = price_max;
+    } else {
+      filtersObject.product_price = {
+        $lte: price_max,
+      };
+    }
+  }
+
+  console.log(filtersObject);
+
+  const sortObject = {};
+  if (req.query.sort === "price-desc") {
+    sortObject.product_price = "desc";
+  } else if (req.query.sort === "price-asc") {
+    sortObject.product_price = "asc";
+  }
+
+  let limit = 3;
+  if (req.query.limit) {
+    limit = let.query.limit;
+  }
+
+  let page = 1;
+  if (req.query.page) {
+    page = req.query.page;
+  }
+
+  const offers = await Offer.find(filtersObject)
+    .sort(sortObject)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .select("product_name product_price");
+
+  const count = await Offer.countDocuments(filtersObject);
+
+  res.json({ count: count, offers: offers });
+});
+
+router.get("/offer/:id", async (req, res) => {
   try {
-    // const offer = await User.findOne
-    const title = req.query.title;
-    const price_min = req.query.priceMin;
-    const price_max = req.query.priceMax;
-    const page = req.query.page;
-
-    // const filters = {};
-
-    // filters.product_name = title;
-    // filters.product_price = { $gte: price_min, $lte: price_max };
-
-    // console.log(filters);
-
-    // const offers = await Offer.find(filters).limit(3).sort("desc");
-    // const offers = await Offer.find({
-    //   product_price: { $gte: price_min, $lte: price_max },
-    // })
-
-    //   .sort({ product_price: "desc" })
-    //   .limit(req.query.limit)
-    //   .skip(2)
-    //   .select("product_name product_price");
-
-    // console.log(offers);
-    // newPage = req.query.page;
-    // const page = await Offer.find().select(
-    //   "product_name product_detail product"
-    // );
-    // .select(
-    //   "product_name product_details "
-    // );
-    // const offer = await Offer.findOne({
-    //   token: req.headers.authorization.replace("Bearer ", ""),
-    // console.log("====>", page);
-    const offers = await Offer.find();
-    res.status(200).json({
-      offers,
+    const offer = await Offer.findById(req.params.id).populate({
+      path: "owner",
+      select: "account.username account.phone",
     });
+    res.json(offer);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json(error.message);
   }
 });
 
